@@ -1,0 +1,140 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load socialaccount %}
+
+{% block extra_css %}
+<style>
+  .auth-wrap{ max-width: 1200px; margin: 70px auto 60px; }
+  .auth-grid{ display:grid; grid-template-columns: 520px 1fr; gap: 50px; align-items:start; }
+  .auth-hero{
+    width:520px; height:520px; border-radius:10px; overflow:hidden;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    animation:fadeIn .5s ease both;
+  }
+  .auth-hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .auth-card{ animation: slideUp .55s ease both; }
+  .auth-title{ font:700 52px/1.05 "Poppins", system-ui, sans-serif; color:#4cc14b; margin:0 0 14px; }
+  .auth-sub{ color:black; font:600 16px/1.4 "Inter", system-ui, sans-serif; margin-bottom:20px; }
+  .auth-sub a{ color:#4cc14b; text-decoration:none; }
+  .auth-sub a:hover{ text-decoration:underline; }
+
+  .form-control{
+    height:46px; border:1px solid #e7e7e7; border-radius:8px; padding:10px 14px;
+    font:500 14px/1.2 "Inter", sans-serif;
+    transition: box-shadow .2s ease, border-color .2s ease;margin-bottom: 40px;
+  }
+  .form-control:focus{
+    border-color:#8be08a; box-shadow:0 0 0 3px rgba(76,193,75,.18);
+  }
+  .pass-wrap{ position:relative; }
+  .toggle-eye{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    background:transparent; border:none; color:#9a9a9a; font-size:18px;
+  }
+
+  .auth-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:6px;margin-bottom: 20px; }
+  .auth-remember{ font:500 16px/1 "Inter", sans-serif; color:#444; }
+  .auth-link{ color:#999; font:500 16px/1 "Inter", sans-serif; text-decoration:none; }
+  .auth-link:hover{ color:#555; }
+
+  .btn-green{
+    display:inline-block; width:100%; height:44px; border-radius:8px; border:none; cursor:pointer;
+    background:#58cd54; color:#fff; font:600 14px/44px "Inter", sans-serif;
+    box-shadow:0 6px 16px rgba(88,205,84,.35);
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    margin:10px 0 16px;
+  }
+  .btn-green:hover{ transform:translateY(-1px); background:#49bd45; }
+  .hr-lite{ border:none; border-top:1px solid #eee; margin:18px 0; }
+  .or{ font:600 16px/1 "Inter", sans-serif; color:#7c7c7c; text-align:center; margin:-8px 0 18px; }
+
+  .btn-social{
+    height:40px; border:1px solid #e7e7e7; border-radius:8px; background:#fff; color:#333;
+    display:flex; align-items:center; gap:8px; justify-content:center;
+    font:600 13px/1 "Inter", sans-serif; transition:transform .12s ease, box-shadow .2s ease;text-decoration: none;
+  }
+  .btn-social:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,0,0,.06); }
+  .btn-facebook{ margin-left:10px; }
+
+  /* messages */
+  .msg{ padding:10px 12px; border-radius:8px; font:600 13px/1.3 "Inter"; margin:10px 0; }
+  .msg.error{ background:#ffe8e8; color:#a40000; border:1px solid #ffc9c9; }
+  .msg.success{ background:#eaffea; color:#056b05; border:1px solid #b9efba; }
+
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes slideUp{ from{opacity:.0; transform:translateY(10px)} to{opacity:1; transform:none} }
+
+  @media (max-width: 820px){
+    .auth-grid{ grid-template-columns: 1fr; }
+    .auth-hero{ width:100%; height:260px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-grid">
+
+    <!-- LEFT IMAGE -->
+    <figure class="auth-hero">
+<img src="/media/static/core/images/login.png" alt="Jewellery">
+    </figure>
+
+    <!-- RIGHT FORM -->
+    <section class="auth-card">
+      <h1 class="auth-title">Log In</h1>
+      <p class="auth-sub">Don’t have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+
+      {% for m in messages %}
+        <div class="msg {% if m.tags %}{{ m.tags }}{% endif %}">{{ m }}</div>
+      {% endfor %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-2">
+          <input class="form-control" name="username" placeholder="User Name" required>
+        </div>
+
+        <div class="mb-2 pass-wrap">
+          <input class="form-control" id="loginPass" type="password" name="password" placeholder="Enter Your Password" required>
+          <button type="button" class="toggle-eye" data-target="#loginPass"><i class="bi bi-eye-slash"></i></button>
+        </div>
+
+        <div class="auth-actions">
+          <label class="auth-remember"><input type="checkbox" name="remember"> Remember me</label>
+          <a class="auth-link" href="{% url 'account_reset_password' %}">Forgot Password?</a>
+        </div>
+
+        <button class="btn-green" type="submit">Login account</button>
+      </form>
+
+      <hr class="hr-lite">
+      <div class="or">OR Signup With</div>
+
+      <div class="d-flex">
+        <a class="btn-social flex-fill" href="{% provider_login_url 'google' %}">
+          <img width="18" height="18" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+          Google
+        </a>
+        
+      </div>
+    </section>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // toggle password
+  document.querySelectorAll(".toggle-eye").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const input = document.querySelector(btn.dataset.target);
+      const icon = btn.querySelector("i");
+      if(input.type === "password"){ input.type = "text"; icon.className="bi bi-eye"; }
+      else{ input.type="password"; icon.className="bi bi-eye-slash"; }
+    });
+  });
+</script>
+{% endblock %}

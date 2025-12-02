@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}My Cart | Mega Jewellery{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/cart.css' %}">
+
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4 fw-bold text-center animate-fade">🛒 Your Cart</h2>
+
+  {% if cart %}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="cart-items">
+        {% for pk, item in cart.items %}
+        <div class="cart-card shadow-sm animate-slide">
+          <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-img">
+          <div class="cart-info">
+            <h5>{{ item.name }}</h5>
+            
+            <div class="qty-controls">
+              <a href="{% url 'update_cart' pk 'decrease' %}" class="btn-qty">-</a>
+              <span class="qty">{{ item.qty }}</span>
+              <a href="{% url 'update_cart' pk 'increase' %}" class="btn-qty">+</a>
+            </div>
+          </div>
+          <a href="{% url 'update_cart' pk 'remove' %}" class="btn-remove">&times;</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="summary-card shadow-lg animate-pop">
+        <h4 class="fw-bold">Order Summary</h4>
+        <table class="table">
+          <tr><td>Subtotal</td><td>₹{{ total }}</td></tr>
+          <tr><td>Tax (10%)</td><td>₹{{ tax }}</td></tr>
+          <tr class="fw-bold"><td>Total Items</td><td>{{ cart_count }}</td></tr>
+          <tr class="fw-bold"><td>Total Price</td><td>₹{{ cart_total }}</td></tr>
+        </table>
+       <a href="{% url 'checkout' %}" class="btn btn-dark w-100 mt-3">Proceed to Checkout</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+    <p class="text-center">No items in cart.</p>
+  {% endif %}
+</div>
+{% endblock %}

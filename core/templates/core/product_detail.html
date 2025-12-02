@@ -1,0 +1,244 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Products | Cherii{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/product_detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+{% endblock %}
+
+{% block content %}
+{% if banner %}
+<section class="category-banner" style="background-image: url('{{ banner.image.url }}');">
+  <div class="banner-overlay">
+    <h1 class="banner-title">{{ banner.title }}</h1>
+  </div>
+</section>
+{% endif %}
+
+<div class="breadcrumb">
+  <a href="{% url 'home' %}">Home</a> <span>›</span>
+  <a href="{% url 'rental_page' %}">Collections</a> <span>›</span>
+  <span>{{ category.name }}</span>
+</div>
+
+<div class="product-grid">
+  {% for product in products %}
+  <div class="product-card">
+    <!-- Wishlist -->
+    <!-- Inside product card -->
+    <a href="{% url 'add_to_wishlist' product.id %}" class="wishlist">
+      <i class="fa-regular fa-heart"></i>
+    </a>
+
+
+    <!-- Product Image -->
+    <a href="{% url 'product_detail' product.id %}">
+      {% if product.image and product.image.url %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      {% else %}
+      <img src="{% static product.image %}" alt="{{ product.name }}">
+      {% endif %}
+    </a>
+
+    <!-- Name & Rating -->
+    <div class="product-header">
+      <h3>{{ product.name }}</h3>
+      <span class="rating"><i class="fa fa-star"></i> {{ product.rating }}</span>
+    </div>
+
+    <!-- Short Description -->
+    <p class="short-desc">{{ product.short_description|default:"Elegant jewelry piece" }}</p>
+
+    <!-- Price & Rent Now -->
+    <div class="product-footer">
+      <span class="price">₹{{ product.price_per_day }}</span>
+      {% if user.is_authenticated %}
+     <a href="{% url 'add_to_cart' product.id %}" class="btn-rent" data-name="{{ product.name }}">Add to cart</a>
+
+      {% else %}
+     <a href="{% url 'login' %}" class="btn-rent login-required">Add to cart</a>
+
+      {% endif %}
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div id="popupModal" class="popup-modal">
+  <div class="popup-content">
+    <span id="popupMessage"></span>
+  </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+  {% if products.has_previous %}
+  <a href="?page={{ products.previous_page_number }}">« Prev</a>
+  {% endif %}
+
+  <span>Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+
+  {% if products.has_next %}
+  <a href="?page={{ products.next_page_number }}">Next »</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+<script>
+
+
+  // Wishlist toggle
+  document.querySelectorAll('.wishlist').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      btn.querySelector('i').classList.toggle('fa-regular');
+      btn.querySelector('i').classList.toggle('fa-solid');
+    });
+  });
+
+function flyToCart(productId) {
+  const productImg = document.getElementById("product-" + productId);
+  const cartIcon = document.getElementById("cartIcon");
+
+  if (!productImg || !cartIcon) return;
+
+  // Clone product image
+  const imgClone = productImg.cloneNode(true);
+  const rect = productImg.getBoundingClientRect();
+  imgClone.style.position = "fixed";
+  imgClone.style.left = rect.left + "px";
+  imgClone.style.top = rect.top + "px";
+  imgClone.style.width = rect.width + "px";
+  imgClone.style.height = rect.height + "px";
+  imgClone.style.opacity = "0.8";
+  imgClone.style.zIndex = "9999";
+  imgClone.style.transition = "all 1s cubic-bezier(.4,-0.3,.6,1.5)";
+
+  document.body.appendChild(imgClone);
+
+  // Animate to cart
+  const cartRect = cartIcon.getBoundingClientRect();
+  setTimeout(() => {
+    imgClone.style.left = cartRect.left + "px";
+    imgClone.style.top = cartRect.top + "px";
+    imgClone.style.width = "40px";
+    imgClone.style.height = "40px";
+    imgClone.style.opacity = "0.2";
+  }, 50);
+
+  // Remove after animation
+  setTimeout(() => { imgClone.remove(); }, 1000);
+}
+(function () {
+  "use strict";
+
+  // small helper for safe console logging
+  function maybeLog(...args) {
+    if (window && window.console) console.log("[popup]", ...args);
+  }
+
+  // Wait for DOM ready in a safe manner
+  function ready(fn) {
+    if (document.readyState !== "loading") return fn();
+    document.addEventListener("DOMContentLoaded", fn);
+  }
+
+  ready(function () {
+    maybeLog("DOM ready — initializing popup handlers");
+
+    const popup = document.getElementById("popupModal");
+    const popupMsg = document.getElementById("popupMessage");
+
+    if (!popup || !popupMsg) {
+      maybeLog("popup elements not found — ensure popup HTML exists with id=popupModal and id=popupMessage");
+      return;
+    }
+
+    // helper to show popup (uses CSS class 'visible' so CSS controls display)
+    function showPopup(message, redirectUrl = null, delayMs = 900) {
+      try {
+        popupMsg.innerHTML = message;
+        popup.classList.add("visible");
+        popup.setAttribute("aria-hidden", "false");
+
+        // dismiss if clicked outside content
+        const onDocClick = (e) => {
+          if (e.target === popup) hidePopup();
+        };
+        popup.addEventListener("click", onDocClick, { once: true, passive: true });
+
+        // auto hide + optional redirect
+        const t = setTimeout(() => {
+          hidePopup();
+          if (redirectUrl) {
+            // small safety: only follow same-origin or absolute http(s)
+            try { window.location.href = redirectUrl; } catch (err) { maybeLog("redirect failed", err); }
+          }
+        }, delayMs);
+
+        // return function to cancel if needed
+        return function cancel() {
+          clearTimeout(t);
+          hidePopup();
+        };
+      } catch (err) {
+        maybeLog("showPopup error", err);
+      }
+    }
+
+    function hidePopup() {
+      popup.classList.remove("visible");
+      popup.setAttribute("aria-hidden", "true");
+    }
+
+    // Delegated click handling for Add-to-cart and Login buttons inside product-grid
+    const grid = document.querySelector(".product-grid");
+    if (!grid) {
+      maybeLog("product-grid not found — trying document delegation");
+    }
+
+    // event handler for clicks anywhere — we use nearest .btn-rent or .login-required link
+    document.addEventListener("click", function (ev) {
+      const el = ev.target;
+      // find nearest anchor with class 'btn-rent' (handles clicks on inner elements)
+      const btn = el.closest && el.closest("a.btn-rent");
+      if (!btn) return; // not a rent button, ignore
+
+      // prevent default navigation, we'll redirect after show
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const href = btn.getAttribute("href") || null;
+      const isLoginReq = btn.classList.contains("login-required");
+
+      // find product name from nearby title element
+      let pname = "";
+      try {
+        const card = btn.closest(".product-card");
+        if (card) {
+          const titleEl = card.querySelector("h3, h4");
+          if (titleEl) pname = titleEl.textContent.trim();
+        }
+      } catch (err) {
+        maybeLog("error finding product name", err);
+      }
+
+      if (isLoginReq) {
+        showPopup("⚠️ Please login to continue", href, 1200);
+        return;
+      }
+
+      // normal add-to-cart case
+      const msg = pname ? `✅ ${pname} added successfully!` : "✅ Item added successfully!";
+      showPopup(msg, href, 900);
+    }, { passive: false });
+
+    maybeLog("Popup handlers attached. Click a .btn-rent to test.");
+  });
+})();
+</script>
+

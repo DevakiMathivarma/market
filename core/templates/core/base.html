@@ -1,0 +1,418 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mega Jewellery • Navbar</title>
+<link rel="icon" type="image/png" href="{% static 'core/images/logo2.png' %}">
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <style>
+        /* ===== Navbar (no CSS variables) ===== */
+        .mega-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #ededed;
+            height: 80px;
+            animation: fadeDown .45s ease both;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .mega-nav .container-fluid {
+            height: 100%;
+        }
+
+        /* Brand */
+        .brand-wrap {
+            gap: 0.45rem;
+        }
+
+        .brand-logo {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-text {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-weight: 600;
+            font-size: 19px;
+            color: #444444;
+            letter-spacing: .2px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* Center links (desktop) */
+        .main-nav {
+            height: 100%;
+        }
+
+        .main-nav .nav-link {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 18px;
+            color: #0e0e0e;
+            padding: 0 16px !important;
+            line-height: 56px;
+            /* match bar height */
+            position: relative;
+            transition: color .2s ease;
+        }
+
+        .main-nav .nav-link:hover {
+            color: #222222;
+        }
+
+        .main-nav .nav-link.active::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 12px;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 2px;
+            background: #000000;
+            border-radius: 2px;
+        }
+
+        /* Right icons */
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e2e2e2;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: #222222;
+            background: #ffffff;
+            transition: all .18s ease;
+        }
+
+        .icon-btn:hover {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        /* Mobile toggle button */
+        .btn-toggle {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            color: #222222;
+            background: #f4f4f4;
+            display: grid;
+            place-items: center;
+            transition: background .18s ease;
+        }
+
+        .btn-toggle:hover {
+            background: #e9e9e9;
+        }
+
+        /* Offcanvas (mobile menu) */
+        .mega-offcanvas {
+            width: 280px;
+            background: #ffffff;
+            border-left: 1px solid #ededed;
+        }
+
+        .mega-offcanvas .offcanvas-header {
+            border-bottom: 1px solid #ededed;
+        }
+
+        .mega-offcanvas .offcanvas-title {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #222222;
+        }
+
+        .mobile-links .nav-link {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 16px;
+            color: #111111;
+            padding: .6rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .mobile-links .nav-link:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== Footer Base ===== */
+.mega-footer {
+  background: #CBC9C9;;  
+  padding: 40px 20px 20px;
+  font-family: "Poppins", sans-serif;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 30px;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+/* Logo + Brand */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.footer-logo img {
+  width: 42px;
+  height: auto;
+}
+.footer-logo .brand-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+}
+.footer-desc {
+  margin-top: 16px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #000;
+  text-align: justify;
+}
+
+/* Columns */
+.footer-col h4 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #000;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.footer-col ul li {
+  margin: 8px 0;
+}
+.footer-col ul li a {
+  font-size: 18px;
+  text-decoration: none;
+  color: #000;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.footer-col ul li a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: #fdd835;
+  transition: width 0.3s ease;
+}
+.footer-col ul li a:hover {
+  color: #fdd835;
+  transform: translateX(4px);
+}
+.footer-col ul li a:hover::after {
+  width: 100%;
+}
+
+/* Bottom Bar */
+.footer-bottom {
+  border-top: 1px solid #888;
+  padding-top: 15px;
+  text-align: center;
+}
+.footer-bottom p {
+  font-size: 16px;
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .footer-logo img {
+    width: 36px;
+  }
+}
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .main-nav {
+                display: none !important;
+            }
+
+            /* hide center links on md-down */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="mega-nav navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-3">
+
+            <!-- Brand -->
+            <a class="brand-wrap d-flex align-items-center text-decoration-none" href="#">
+                <img src="{% static 'core/images/logo2.png' %}" class="brand-logo" alt="Mega Jewellery">
+                <span class="brand-text">Infinity Store</span>
+            </a>
+
+            <!-- Center links (desktop only) -->
+            <ul class="navbar-nav main-nav mx-auto d-none d-lg-flex">
+                <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'rental_page' %}">Explore</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+            </ul>
+
+            <!-- Right icons + mobile toggle -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <button class="icon-btn" aria-label="Search"><i class="bi bi-search"></i></button>
+                <!-- Cart Icon with Dynamic Badge -->
+                 
+                <button class="icon-btn position-relative" aria-label="Cart"
+                    onclick="location.href='{% url 'cart_view' %}'">
+                    <i class="bi bi-bag"></i>
+                    {% if cart_count > 0 %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </button>
+
+                <a href="{% url 'login' %}" class="icon-btn" aria-label="Account"><i class="bi bi-person"></i></a>
+
+
+                <!-- Mobile toggle -->
+                <button class="btn-toggle d-lg-none" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Open menu">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ===== Offcanvas (mobile menu) ===== -->
+    <div class="offcanvas offcanvas-end mega-offcanvas" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+        <div class="offcanvas-header">
+            <h6 class="offcanvas-title" id="mobileMenuLabel">Menu</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <nav class="nav flex-column mobile-links">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+                <a class="nav-link" href="{% url 'about' %}">About us</a>
+                <a class="nav-link" href="{% url 'rental_page' %}">Rental</a>
+                <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+            </nav>
+        </div>
+    </div>
+
+    {% block content %}{% endblock %}
+    <!-- ===== Footer ===== -->
+<footer class="mega-footer">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Brand + Text -->
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="{% static 'core/images/logo1.PNG' %}" alt="Mega Jewellery" />
+          <span class="brand-name">Mega Jewellery</span>
+        </div>
+        <p class="footer-desc">
+          Exquisite jewelry crafted with passion, precision, and the finest materials 
+          for life's most precious moments.
+        </p>
+      </div>
+
+      <!-- Collections -->
+      <div class="footer-col">
+        <h4>Collections</h4>
+        <ul>
+          <li><a href="{% url 'rental_page' %}">Diamond Collection</a></li>
+          <li><a href="{% url 'rental_page' %}">Gemstone Collection</a></li>
+          <li><a href="{% url 'rental_page' %}">Pearl Collection</a></li>
+          <li><a href="{% url 'rental_page' %}">Wedding & Engagement</a></li>
+          <li><a href="{% url 'rental_page' %}">Limited Editions</a></li>
+        </ul>
+      </div>
+
+      <!-- Customer Care -->
+      <div class="footer-col">
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="{% url 'contact' %}">Contact Us</a></li>
+          <li><a href="#">Shipping & Returns</a></li>
+          <li><a href="#">Care & Maintenance</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Warranty</a></li>
+        </ul>
+      </div>
+
+      <!-- About -->
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="{% url 'about' %}">Our Story</a></li>
+          <li><a href="#">Craftsmanship</a></li>
+          <li><a href="#">Sustainability</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <p>© 2025 Mega Jewellery. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+  // Detect browser back/forward navigation
+  window.addEventListener("pageshow", function(event) {
+    if (event.persisted || (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
+      window.location.reload();
+    }
+  });
+
+</script>
+{% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

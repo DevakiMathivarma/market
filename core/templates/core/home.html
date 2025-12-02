@@ -1,0 +1,437 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}About Us • Mega Jewellery{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/home.css' %}">
+<style>
+    .promo-banner {
+        background: url('media/static/core/images/yellow1.jpeg') repeat;
+        /* yellow pattern image */
+        padding: 30px;
+        border-radius: 10px;
+        margin: 30px auto;
+        animation: fadeIn 1.2s ease both;
+    }
+    .rent-banner {
+  /* background: url("media/static/core/images/back2.png") no-repeat; */
+  background-size: cover;
+  padding: 60px 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 1.2s ease-in-out;
+  position: relative;
+}
+
+.rent-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;            /* covers full area */
+  background: inherit; /* same background image */
+  background-size: cover;
+  filter: blur(6px);   /* <-- adjust blur */
+  opacity: 0.5;        /* <-- adjust transparency */
+  z-index: -1;         /* keeps content on top */
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="rent-banner">
+  <div class="rent-inner">
+    <!-- Left Content -->
+    <div class="rent-text">
+      <h2>Your One-Stop Marketplace for Quality & Convenience</h2>
+      <p>
+        Explore top categories including Electronics, Fashion, Home & Kitchen, Beauty, Groceries, and Lifestyle. Find the best deals, trending products, and trusted brands curated for your everyday needs.
+      </p>
+      <a href="#" class="btn-yellow">Start Shopping</a>
+    </div>
+
+    <!-- Right Images -->
+    <div class="rent-images">
+      <div class="img-back"><img src="media/static/core/images/banner.png" alt="Jewelry Model"></div>
+      <div class="img-front">
+        <img src="media/static/core/images/banner1.png" alt="Jewelry Model">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="category-section">
+    <div class="category-container">
+        <h2 class="category-title">Shop by Category</h2>
+        <p class="category-subtitle">Jewelry curated for every style</p>
+    </div>
+
+
+    <div class="category-grid">
+       {% for category in categories %}
+  <div class="category-card">
+    {% if category.slug %}
+      <a href="{% url 'parent_category' category.slug %}">
+    {% else %}
+      <a href="#">
+    {% endif %}
+        <img src="{{ category.image.url }}" alt="{{ category.name }}">
+      <h3 style="color:#000; background:#fff;">{{ category.name|default:'(no name)' }}</h3>
+      </a>
+  </div>
+{% endfor %}
+    </div>
+</section>
+
+<!-- ====== New Arrivals Section ====== -->
+<div class="new-arrivals" >
+  <h2 class="section-title">New Arrivals</h2>
+  <p class="section-subtitle">Explore the newest additions to our collection</p>
+</div>
+
+{% for category in categories %}
+  <div class="category-block" >
+   
+
+    <div class="product-grid">
+      {% for product in category.preview_products %}
+  <div class="product-card">
+    <!-- Wishlist -->
+    <button class="wishlist"><i class="fa-regular fa-heart"></i></button>
+
+    <!-- Product Image -->
+    <a href="{% url 'product_detail' product.id %}">
+      {% if product.image and product.image.url %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      {% else %}
+        <img src="{% static 'core/images/placeholder.png' %}" alt="{{ product.name }}">
+      {% endif %}
+    </a>
+
+    <!-- Name & Rating -->
+    <div class="product-header">
+      <h3>{{ product.name }}</h3>
+      <span class="rating"><i class="fa fa-star"></i> {{ product.rating }}</span>
+    </div>
+
+    <!-- Short Description -->
+    <p class="short-desc">{{ product.short_description|default:"Elegant jewelry piece" }}</p>
+
+    <!-- Price & Rent Now -->
+    <div class="product-footer">
+      <span class="price">₹{{ product.price_per_day }}</span>
+      {% if user.is_authenticated %}
+        <a href="{% url 'add_to_cart' product.id %}" onclick="alert('✅ {{ product.name }} rented successfully!');" class="btn-rent">Rent Now</a>
+      {% else %}
+        <a href="{% url 'login' %}" onclick="alert('⚠️ Please login to rent this product');" class="btn-rent">Rent Now</a>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+    </div>
+  </div>
+{% endfor %}
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true" style="display:none;">
+  <div class="toast" id="toast">
+    <div class="ico" id="toastIco">✓</div>
+    <div class="text" id="toastText">Added to cart</div>
+    <button class="close" id="toastClose" aria-label="Close">&times;</button>
+  </div>
+</div>
+
+<!-- Promo Banner -->
+<section class="promo-banner ">
+    <div class="promo-inner">
+        <div class="promo-img">
+            <img src="{{ banner.product_image.url }}" alt="">
+        </div>
+        <div class="promo-text">
+            <h3>{{ banner.title }}</h3>
+            <p>{{ banner.subtitle }}</p>
+            {% if promo.code %}<small>Use code <b>{{ promo.code }}</b></small>{% endif %}
+            <a href="{{ banner.button_link }}" class="btn-green">{{ banner.button_text }}</a>
+            
+        </div>
+    </div>
+</section>
+
+<!-- Trending Now -->
+<section class="trending-now">
+    <h2 class="r1">Trending Now</h2>
+    <p class="r2">Bestselling styles you won’t want to miss!</p>
+
+    {% for section in featured %}
+    <div class="featured-block {{ section.position }}">
+        {% if section.position == "left" %}
+        <div class="featured-img"><img src="{{ section.image.url }}" alt=""></div>
+        <div class="featured-text">
+            <h3>{{ section.title }}</h3>
+            <h5>{{ section.subtitle }}</h5>
+            <p>{{ section.description }}</p>
+            <a href="{{ section.button_link }}" class="btn-green">{{ section.button_text }}</a>
+        </div>
+        {% else %}
+        <div class="featured-text">
+            <h3>{{ section.title }}</h3>
+            <h5>{{ section.subtitle }}</h5>
+            <p>{{ section.description }}</p>
+            <a href="{{ section.button_link }}" class="btn-green">{{ section.button_text }}</a>
+        </div>
+        <div class="featured-img"><img src="{{ section.image.url }}" alt=""></div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>
+
+<!-- Services Section -->
+<section class="services">
+  <h2>Services</h2>
+  <p>Trust us with your jewelry</p>
+
+  <div class="services-grid">
+    {% for service in services %}
+    <div class="service-card">
+      <div class="service-img">
+        <img src="{{ service.image.url }}" alt="{{ service.title }}">
+      </div>
+      <h4>{{ service.title }}</h4>
+      <p>{{ service.subtitle }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Customer Stories -->
+<section class="customer-stories">
+  <h2 class="stories-title">Customer Stories</h2>
+  <p class="stories-subtitle">What Our Customers Are Saying</p>
+
+  <div class="carousel-container">
+    <div class="carousel-track">
+      {% for t in testimonials %}
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <span class="quote">❝</span>
+          <p>{{ t.message }}</p>
+        </div>
+        <div class="testimonial-footer">
+          <img src="{{ t.photo.url }}" alt="{{ t.name }}">
+          <div>
+            <h4>{{ t.name }}</h4>
+            <span>{{ t.role }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Dots -->
+    <div class="carousel-dots">
+      {% for t in testimonials %}
+        <span class="dot {% if forloop.first %}active{% endif %}"></span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<!-- FAQ -->
+ <section class="faq-section">
+  <h2>Frequently Asked Questions</h2>
+  <p>Answers to your most common queries</p>
+
+  <div class="faq-item">
+    <div class="faq-question">
+      Do you offer free shipping?
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="faq-answer">
+      Yes, we offer free shipping on all domestic orders. International shipping costs may apply based on the destination.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">
+      What payment methods do you accept?
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="faq-answer">
+      We accept all major credit/debit cards, UPI, Net Banking, PayPal, and wallets such as Google Pay and PhonePe.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">
+      Can I return or exchange a product?
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="faq-answer">
+      Yes, you can return or exchange items within 7 days of delivery, provided they are unworn and in original packaging.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">
+      Do you offer customization or personalized jewelry?
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="faq-answer">
+      Absolutely! We provide customization options for rings, necklaces, and bracelets. Our experts will work with you to create your dream piece.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">
+      Do you ship to Coimbatore and other Tier 2 cities?
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="faq-answer">
+      Yes, we ship to Coimbatore and across India, including Tier 2 and Tier 3 cities. Delivery time may vary based on location.
+    </div>
+  </div>
+</section> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const track = document.querySelector(".carousel-track");
+  const cards = document.querySelectorAll(".testimonial-card");
+
+  // 👇 number of slides = total cards / 3
+  const slidesToShow = 3;
+  const totalSlides = Math.ceil(cards.length / slidesToShow);
+
+  // Build dots dynamically based on slides
+  const dotsContainer = document.querySelector(".carousel-dots");
+  dotsContainer.innerHTML = ""; // clear old
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement("span");
+    dot.classList.add("dot");
+    if (i === 0) dot.classList.add("active");
+    dotsContainer.appendChild(dot);
+  }
+  const dots = document.querySelectorAll(".dot");
+
+  let index = 0;
+
+  function showSlide(i) {
+    track.style.transform = `translateX(-${i * 100}%)`;
+    dots.forEach(dot => dot.classList.remove("active"));
+    dots[i].classList.add("active");
+  }
+
+  // Auto play
+  setInterval(() => {
+    index = (index + 1) % totalSlides;
+    showSlide(index);
+  }, 4000);
+
+  // Dots click
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+      index = i;
+      showSlide(index);
+    });
+  });
+});
+// Wishlist toggle
+  document.querySelectorAll('.wishlist').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      btn.querySelector('i').classList.toggle('fa-regular');
+      btn.querySelector('i').classList.toggle('fa-solid');
+    });
+  });
+//   FAQ
+document.querySelectorAll(".faq-question").forEach((question) => {
+  question.addEventListener("click", () => {
+    const item = question.parentElement;
+
+    // Close other open items
+    document.querySelectorAll(".faq-item").forEach((faq) => {
+      if (faq !== item) faq.classList.remove("active");
+    });
+
+    // Toggle current item
+    item.classList.toggle("active");
+  });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const toastWrap = document.getElementById("toastWrap");
+  const toast = document.getElementById("toast");
+  const toastText = document.getElementById("toastText");
+  const toastClose = document.getElementById("toastClose");
+  const toastIco = document.getElementById("toastIco");
+  let hideTimer = null;
+
+  function showToast(message, type="success", autoClose=true, redirectUrl=null, delayMs=700) {
+    // set content
+    toastText.textContent = message;
+    toastIco.textContent = type === "success" ? "✓" : "⚠";
+    // show
+    toastWrap.style.display = "block";
+    toast.classList.remove("hide");
+    toast.classList.add("show");
+    // clear old timer
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    // schedule hide
+    if (autoClose) {
+      hideTimer = setTimeout(()=> {
+        closeToast();
+        if (redirectUrl) window.location.href = redirectUrl;
+      }, delayMs + 600); // leave time for visible animation
+      // also redirect slightly earlier to feel instant
+      if (redirectUrl) {
+        setTimeout(()=> window.location.href = redirectUrl, delayMs);
+      }
+    }
+  }
+
+  function closeToast() {
+    toast.classList.remove("show");
+    toast.classList.add("hide");
+    // after animation, hide container
+    setTimeout(()=> { toastWrap.style.display = "none"; }, 300);
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+  }
+
+  toastClose.addEventListener("click", function (e) {
+    e.preventDefault();
+    closeToast();
+  });
+
+  // Intercept all rent links (.btn-rent). Works without changing existing HTML.
+  document.querySelectorAll(".btn-rent").forEach(function (link) {
+    // remove any inline onclick to avoid duplicate alerts
+    if (link.hasAttribute("onclick")) link.removeAttribute("onclick");
+
+    link.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const href = link.href;
+      // product name fallback from nearest h3 or h4 inside card
+      const card = link.closest(".product-card");
+      let pname = "";
+      if (card) {
+        const title = card.querySelector("h3, h4");
+        if (title) pname = title.textContent.trim();
+      }
+      // Detect if link goes to login (simple heuristic: contains '/login' or named URL)
+      const isLogin = href && href.match(/\/login/);
+
+      if (isLogin) {
+        showToast("Please login to rent this product", "warning", true, href, 900);
+        return;
+      }
+
+      // Show rented toast, then follow link
+      const msg = pname ? `✅ ${pname} rented successfully!` : "✅ Product rented successfully!";
+      showToast(msg, "success", true, href, 700);
+    });
+  });
+});
+</script>
+
+
+
+{% endblock %}

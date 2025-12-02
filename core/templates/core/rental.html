@@ -1,0 +1,474 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Rental | Mega Jewellery{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/product_detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+<style>
+    .rental-container {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 24px;
+        margin: 24px auto;
+        max-width: 1280px;
+    }
+
+    /* ==== FILTER SIDEBAR ==== */
+    .filters {
+        background: #fff;
+        padding: 14px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .filters h4 {
+        background: #fff799;
+        /* soft yellow background */
+        padding: 6px 10px;
+        margin: 14px 0 8px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 4px;
+    }
+
+    .filters ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .filters li {
+        margin: 6px 0;
+    }
+
+    .filters a {
+        display: block;
+        padding: 6px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #000;
+        background: #fff;
+        font-size: 1.3rem;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .filters a:hover {
+        background: #f3f3f3;
+    }
+
+    .separator {
+        border-top: 1px solid #e5e5e5;
+        margin: 12px 0;
+    }
+
+    /* ==== GENDER RADIO ==== */
+    .filters form {
+        margin-top: 8px;
+    }
+
+    .filters label {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 12px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .filters input[type="radio"] {
+        margin-right: 6px;
+    }
+
+    .separator {
+        border-top: 1px solid #eee;
+        margin: 12px 0;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+    }
+
+    .product-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        position: relative;
+        transition: transform .2s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .wishlist {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: transparent;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .wishlist.active i {
+        color: red;
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 8px;
+    }
+
+    .product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .rating {
+        color: #f0c040;
+    }
+
+    .short-desc {
+        font-size: .9rem;
+        color: #666;
+        margin: 6px 0;
+    }
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .price {
+        font-weight: bold;
+    }
+
+    .btn-rent {
+        background: #28a745;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: .9rem;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .btn-rent:hover {
+        background: #218838;
+    }
+
+    .pagination {
+        margin: 30px auto;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-block;
+        padding: 8px 14px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        color: #333;
+        background: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .pagination a:hover {
+        background: #008ecc;
+        color: #fff;
+        border-color: #008ecc;
+        transform: translateY(-2px);
+    }
+
+    .pagination .active {
+        background: #008ecc;
+        color: #fff;
+        border: 1px solid #008ecc;
+        font-weight: bold;
+        cursor: default;
+    }
+
+    .filters a.active {
+        background: #fff799;
+        /* yellow background */
+        font-weight: bold;
+        border: 1px solid #f0c040;
+        color: #000;
+    }
+
+    /* === Collections Section === */
+    .collections-hero {
+        position: relative;
+        width: 100%;
+        height: 420px;
+        /* adjust height as per screenshot */
+        background: url("{% static 'core/images/rental.PNG' %}") no-repeat center center/cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .collections-hero .overlay {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Title Styling */
+    .collections-title {
+        font-size: 90px;
+        /* exact big font size */
+        font-weight: 700;
+        color: #fff;
+        text-align: center;
+        text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.6);
+        animation: fadeInZoom 2s ease forwards;
+        opacity: 0;
+    }
+
+    /* === Animations === */
+    @keyframes fadeInZoom {
+        0% {
+            opacity: 0;
+            transform: scale(0.7) translateY(40px);
+        }
+
+        5% {
+            opacity: 1;
+            transform: scale(1.05) translateY(0);
+        }
+
+        60% {
+            opacity: 1;
+            transform: scale(1.05) translateY(0);
+        }
+
+        100% {
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    /* Optional Hover Effect */
+    .collections-title:hover {
+        color: #f9d342;
+        /* gold hover */
+        text-shadow: 3px 6px 15px rgba(0, 0, 0, 0.8);
+        transition: all .4s ease-in-out;
+    }
+        @media (max-width:1024px){
+        .product-grid {
+       
+        grid-template-columns: repeat(3,1fr);
+        
+    }
+    }
+    @media (max-width:768px){
+        .product-grid {
+       
+        grid-template-columns: repeat(2,1fr);
+        
+    }
+    }
+    @media (max-width:600px){
+            .rental-container {
+       grid-template-columns: repeat(1,1fr);
+       margin: auto 20px;
+        
+    }
+       .product-grid {
+       
+        grid-template-columns: repeat(1,1fr);
+        
+    }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- <section class="collections-hero">
+    <div class="overlay">
+        <h1 class="collections-title">Collections</h1>
+    </div>
+</section> -->
+
+<div class="breadcrumb">
+    <a href="{% url 'home' %}">Home</a> ›
+    <span>Collection's</span>
+</div>
+
+<div class="rental-container">
+
+    <!-- ===== FILTER PANEL ===== -->
+    <div class="filters">
+        <!-- Categories -->
+        <h4>Categories</h4>
+        <ul>
+            <li><a href="?category=all"
+                    class="{% if request.GET.category == 'all' or not request.GET.category %}active{% endif %}">All</a>
+            </li>
+          <ul>
+{% for cat in categories %}
+    <li>
+        <a href="?category={{ cat.name }}" 
+           class="{% if request.GET.category == cat.name %}active{% endif %}">
+           {{ cat.name }}
+        </a>
+    </li>
+{% endfor %}
+</ul>
+
+        </ul>
+
+        <div class="separator"></div>
+
+        <!-- Materials -->
+        <h4>Materials</h4>
+        <ul>
+            <li><a href="?material=Gold" class="{% if request.GET.material == 'Gold' %}active{% endif %}">Gold</a></li>
+            <li><a href="?material=Silver" class="{% if request.GET.material == 'Silver' %}active{% endif %}">Silver</a>
+            </li>
+            <li><a href="?material=Platinum"
+                    class="{% if request.GET.material == 'Platinum' %}active{% endif %}">Platinum</a></li>
+            <li><a href="?material=Copper" class="{% if request.GET.material == 'Copper' %}active{% endif %}">Copper</a>
+            </li>
+            <li><a href="?material=Brass" class="{% if request.GET.material == 'Brass' %}active{% endif %}">Brass</a>
+            </li>
+        </ul>
+
+        <div class="separator"></div>
+
+        <!-- Price -->
+        <h4>Price</h4>
+        <ul>
+            <li><a href="?price=2000" class="{% if request.GET.price == '2000' %}active{% endif %}">Under ₹2,000</a>
+            </li>
+            <li><a href="?price=4000" class="{% if request.GET.price == '4000' %}active{% endif %}">Medium ₹4,000</a>
+            </li>
+            <li><a href="?price=6000" class="{% if request.GET.price == '6000' %}active{% endif %}">Over ₹6,000</a></li>
+        </ul>
+
+        <div class="separator"></div>
+
+        <!-- Gender -->
+        <h4>Gender</h4>
+        <form method="get">
+            <label><input type="radio" name="gender" value="Men" onchange="this.form.submit()"> Men</label><br>
+            <label><input type="radio" name="gender" value="Women" onchange="this.form.submit()"> Women</label>
+        </form>
+
+        <div class="separator"></div>
+        <a href="{% url 'rental_page' %}" class="btn-clear">Clear Filters</a>
+    </div>
+
+    <!-- ===== PRODUCT GRID ===== -->
+    <div>
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <!-- Wishlist -->
+                <!-- Inside product card -->
+                <a href="{% url 'add_to_wishlist' product.id %}" class="wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                </a>
+
+
+                <!-- Product Image -->
+                <a href="{% url 'product_detail' product.id %}">
+                    {% if product.image and product.image.url %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="{% static product.image %}" alt="{{ product.name }}">
+                    {% endif %}
+                </a>
+
+                <!-- Name & Rating -->
+                <div class="product-header">
+                    <h3>{{ product.name }}</h3>
+                    <span class="rating"><i class="fa fa-star"></i> {{ product.rating }}</span>
+                </div>
+
+                <!-- Short Description -->
+                <p class="short-desc">{{ product.short_description|default:"Elegant jewelry piece" }}</p>
+
+                <!-- Price & Rent Now -->
+                <div class="product-footer">
+                    <span class="price">₹{{ product.price_per_day }}/day</span>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'add_to_cart' product.id %}"
+                        onclick="alert('✅ {{ product.name }} rented successfully!');" class="btn-rent">Rent Now</a>
+                    {% else %}
+                    <a href="{% url 'login' %}" onclick="alert('⚠️ Please login to rent this product');"
+                        class="btn-rent">Rent Now</a>
+                    {% endif %}
+
+                </div>
+            </div>
+            {% empty %}
+            <p>No products found for this filter.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if products.has_previous %}
+            <a
+                href="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.material %}&material={{ request.GET.material }}{% endif %}{% if request.GET.price %}&price={{ request.GET.price }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}">«
+                Prev</a>
+            {% endif %}
+
+            {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+            <span class="active">{{ num }}</span>
+            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %} <a
+                href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.material %}&material={{ request.GET.material }}{% endif %}{% if request.GET.price %}&price={{ request.GET.price }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}">
+                {{ num }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                <a
+                    href="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.material %}&material={{ request.GET.material }}{% endif %}{% if request.GET.price %}&price={{ request.GET.price }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}">Next
+                    »</a>
+                {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true });
+
+    // Wishlist toggle
+    document.querySelectorAll('.wishlist').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('active');
+            btn.querySelector('i').classList.toggle('fa-regular');
+            btn.querySelector('i').classList.toggle('fa-solid');
+        });
+    });
+</script>
+{% endblock %}

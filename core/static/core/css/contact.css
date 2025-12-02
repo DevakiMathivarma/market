@@ -1,0 +1,135 @@
+body{
+    overflow-x: hidden;
+}
+.banner {
+  height: 380px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: zoomBanner 10s infinite alternate ease-in-out;
+}
+.banner-text {
+  font-size: 75px;
+  color: white;
+  font-weight: bold;
+  animation: fadeIn 2s ease-in-out;
+}
+@keyframes zoomBanner {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.breadcrumb a {
+  
+  color: black;
+  text-decoration: none;
+}
+.breadcrumb{
+    margin-top: 50px;
+    font-size: 21px;
+    font-weight: 600;
+    margin-left: 13%;
+}
+.breadcrumb a:hover { color: green; }
+
+.contact-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 50px auto;
+  max-width: 1100px;
+  align-items: center;
+}
+.left h2 { font-size: 48px;font-weight: 600; }
+.left h2 span { color: green; }
+.left form input,
+.left form select,
+.left form textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.left p{
+    font-size: 14px;
+    font-weight: 500;
+}
+.left form button {
+  width: 100%;
+  padding: 14px;
+  background: green;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.left form button:hover { background: darkgreen; transform: scale(1.05); }
+
+.right img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.5s ease;
+}
+.right img:hover { transform: scale(1.05); }
+
+.contact-info {
+  text-align: left;
+margin-left: 200px;
+  max-width: 600px;
+  margin-bottom: 40px;
+}
+.contact-info a {
+  margin: 0 15px;
+  color: black;
+  font-size: 16px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.contact-info a:hover { color: green; }
+@media (max-width:1024){
+  body{overflow-x: hidden;}
+  html{overflow-y: auto;}
+  .banner{
+  max-width: 1090px;
+  overflow-x: hidden;
+}
+}
+@media (max-width:768px){
+  .contact-container{
+  margin: auto 10px;
+}
+.contact-info{
+  margin-left: 100px;
+  margin-top: 30px;
+ 
+}
+.banner{
+  max-width: 1090px;
+}
+}
+@media (max-width:600px){
+.contact-container{
+  grid-template-columns: repeat(1,1fr);
+  margin: auto 10px;
+}
+.contact-info{
+  margin-left: auto;
+ 
+}
+.contact-info a{
+  display: block;
+  padding:10px;
+}
+.breadcrumb{
+  font-size: 18px;
+}
+}

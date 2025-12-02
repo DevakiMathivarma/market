@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}My Wishlist{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/wishlist.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="wishlist-container">
+    <h2>MY WISHLIST</h2>
+
+    <!-- Buttons -->
+    <div class="wishlist-actions">
+        <a href="{% url 'clear_wishlist' %}" class="btn-remove-all">REMOVE ALL</a>
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn-continue">CONTINUE SHOPPING</a>
+    </div>
+
+    <div class="wishlist-grid">
+        {% if products %}
+        {% for product in products %}
+        <div class="wishlist-card">
+            <!-- <img src="{{ product.image.url }}" alt="{{ product.name }}"> -->
+            <a href="{% url 'product_detail' product.id %}">
+                {% if product.image and product.image.url %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                <img src="{% static product.image %}" alt="{{ product.name }}">
+                {% endif %}
+            </a>
+
+            <div class="product-header">
+                <h3>{{ product.name }}</h3>
+                <span class="rating"><i class="fa fa-star"></i> {{ product.rating }}</span>
+            </div>
+
+            <!-- Short Description -->
+            <p class="short-desc">{{ product.short_description|default:"Elegant jewelry piece" }}</p>
+
+            <!-- Price & Rent Now -->
+            <div class="product-footer">
+                <span class="price">₹{{ product.price_per_day }}/day</span>
+                <a href="#" class="btn-rent">Rent Now</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No items in your wishlist yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

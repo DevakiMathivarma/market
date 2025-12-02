@@ -1,0 +1,146 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Mega Jewellery{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/product_description.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"/>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+
+  <!-- LEFT SIDE - Thumbnails -->
+  <div class="thumbnails">
+    <img src="{{ product.thumbnail1.url|default:product.thumbnail1 }}" class="thumb" alt="{{ product.name }}">
+    <img src="{{ product.thumbnail2.url|default:product.thumbnail2 }}" class="thumb" alt="{{ product.name }}">
+    <img src="{{ product.thumbnail3.url|default:product.thumbnail3 }}" class="thumb" alt="{{ product.name }}">
+  </div>
+
+  <!-- CENTER - Main Image -->
+  <div class="main-image">
+    <img id="mainImage" src="{{ product.get_image_url }}" alt="{{ product.name }}">
+  </div>
+
+  <!-- RIGHT SIDE - Info -->
+  <div class="product-info">
+    <h2 class="product-title">{{ product.name }}</h2>
+    <p class="product-subtitle">{{ product.name_description }}</p>
+
+    <!-- Size, Metal, Customize -->
+    <div class="options">
+      <div class="option"><strong>Size</strong>:<br> {{ product.size }}</div>
+      <div class="option"><strong>Material</strong>:<br> {{ product.metal }}</div>
+      <div class="option"><button class="btn-customize">Customize</button></div>
+    </div>
+
+    <!-- Color Options -->
+    <div class="colors">
+      <span>Color:Rose Gold</span><br>
+      <button class="color-swatch" style="background:#FFD700"></button>
+      <button class="color-swatch" style="background:#FF1493"></button>
+      <button class="color-swatch" style="background:#008000"></button>
+      <button class="color-swatch" style="background:#000"></button>
+      <button class="color-swatch" style="background:#800080"></button>
+    </div>
+
+    <!-- Quantity & Book Now -->
+<form method="post" action="{% url 'book_now' product.id %}">
+  {% csrf_token %}
+  <div class="purchase">
+    <div class="quantity">
+      <button type="button" id="decrease">-</button>
+      <input id="quantity" type="text" name="qty" value="{{ quantity_in_cart }}" readonly>
+      <button type="button" id="increase">+</button>
+    </div>
+    <button type="submit" class="btn-book">BOOK NOW</button>
+  </div>
+</form>
+
+
+    <!-- Delivery, Payment, Warranty, Care -->
+    <div class="details-tabs">
+      <div class="tab">Delivery</div>
+      <div class="tab">Payment</div>
+      <div class="tab">Warranty</div>
+      <div class="tab">Care</div>
+    </div>
+  </div>
+</div>
+
+<!-- DESCRIPTION -->
+<div class="description" >
+  <h3>DESCRIPTION</h3>
+  <p>{{ product.description }}</p>
+</div>
+
+<!-- RELATED IMAGES + VIDEO -->
+<div class="related-section" >
+  <img src="{{ product.thumbnail1.url|default:product.thumbnail1 }}" class="related-img" alt="">
+  <video controls class="related-video">
+    <source src="{{ product.video.url|default:product.video }}" type="video/mp4">
+  </video>
+  <img src="{{ product.thumbnail2.url|default:product.thumbnail2 }}" class="related-img" alt="">
+</div>
+
+<h2 style="margin-top:40px;">You May Also Like</h2>
+<div class="product-grid">
+  {% for p in recommended %}
+    <div class="product-card">
+      <a href="{% url 'product_detail' p.id %}">
+        <img src="{{ p.get_image_url }}" />
+        <h4>{{ p.name }}</h4>
+        <span>₹{{ p.price_per_day }}</span>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+<h2 style="margin-top:40px;">Customers also bought</h2>
+{% if also_bought %}
+<div class="product-grid">
+  {% for p in also_bought %}
+    <div class="product-card">
+      <a href="{% url 'product_detail' p.id %}">
+        <img src="{{ p.get_image_url }}" alt="{{ p.name }}">
+        <h4>{{ p.name }}</h4>
+        <span>₹{{ p.price_per_day }}</span>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+{% else %}
+  <!-- optional fallback: show top recommended or don't show anything -->
+  <p style="color:#666">Customers also bought recommendations are not available yet.</p>
+{% endif %}
+
+
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 1000, once: true });
+
+  // Thumbnail click to change main image
+  document.querySelectorAll('.thumb').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      document.getElementById('mainImage').src = img.src;
+    });
+  });
+
+  // Quantity control
+  const qtyInput = document.getElementById("quantity");
+  document.getElementById("decrease").addEventListener("click", () => {
+    if (parseInt(qtyInput.value) > 1) {
+      qtyInput.value = parseInt(qtyInput.value) - 1;
+    }
+  });
+  document.getElementById("increase").addEventListener("click", () => {
+    qtyInput.value = parseInt(qtyInput.value) + 1;
+  });
+</script>
+
+{% endblock %}

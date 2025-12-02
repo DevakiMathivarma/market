@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}My Orders | Mega Jewellery{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static 'core/css/orders.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="order-container container mt-5">
+  <div class="card shadow-lg p-4 order-card">
+    <div class="text-center mb-4">
+      <h2 class="text-success fw-bold">🎉 Order Confirmed!</h2>
+      <p class="lead">Thank you for your order with <b>Mega Jewellery</b>. We’re preparing it with care.</p>
+    </div>
+
+    <h4 class="mb-3 border-bottom pb-2">Order Summary</h4>
+    <ul class="list-group list-group-flush mb-3">
+      {% for key, item in cart.items %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <span class="fw-semibold">{{ item.name }}</span>  
+          <small class="text-muted">(x{{ item.qty }})</small>
+        </div>
+        <span class="price">₹{{ item.price }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="summary-total d-flex justify-content-between align-items-center border-top pt-3">
+      <h5 class="fw-bold">Total Paid:</h5>
+      <h5 class="text-primary">₹{{ total }}</h5>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

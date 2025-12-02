@@ -1,0 +1,55 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}About • Dee Plus{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/contact.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="banner" style="background-image:url('{{ contact.banner_image.url }}');">
+  <h1 class="banner-text">Contact us</h1>
+</div>
+
+<div class="breadcrumb">
+  <a href="{% url 'home' %}">Home</a> > Collections > Contact us
+</div>
+
+<div class="contact-container">
+  <div class="left">
+    <h2>Get in <span>Touch</span></h2>
+    <p>{{ contact.description }}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <input type="text" name="name" placeholder="Name*" required>
+      <input type="email" name="email" placeholder="Email*" required>
+      <input type="text" name="phone" placeholder="Phone number*" required>
+      {{ form.how_find }}
+      <textarea name="message" placeholder="Message"></textarea>
+      <button type="submit">SEND</button>
+    </form>
+  </div>
+
+  <div class="right">
+    <img src="{{ contact.right_side_image.url }}" alt="Contact Image">
+  </div>
+</div>
+
+<div class="contact-info">
+  <a href="tel:{{ contact.phone }}">📞 {{ contact.phone }}</a>
+  <a href="tel:{{ contact.fax }}">📠 {{ contact.fax }}</a>
+  <a href="mailto:{{ contact.email }}">📧 {{ contact.email }}</a>
+</div>
+
+{% endblock %}
+<script>
+function validateName(input) {
+    input.value = input.value.replace(/[^A-Za-z ]/g, '');  // Remove numbers/symbols
+}
+
+function validatePhone(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');  // Remove letters/symbols
+}
+</script>
